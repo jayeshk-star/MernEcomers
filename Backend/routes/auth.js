@@ -3,6 +3,7 @@ const User = require("../models/User");
 
 const CryptoJs = require("crypto-js");
 
+const Jwt = require("jsonwebtoken");
 
 //register
 
@@ -37,9 +38,18 @@ router.post("/login", async (req, res) => {
     oldpassword !== req.body.password &&
       res.status(401).json("user does not exist");
 
-    const { password, ...other } = user._doc;
+    const accesToken = Jwt.sign(
+      {
+        id: user._id,
+        isAdmin: user.isAdmin,
+      },
+      process.env.JWTKEY,
+      { expiresIn: "5d" }
+    );
 
-    return res.status(201).json(user);
+    const { password, ...others } = user._doc;
+
+    res.status(200).json({ ...others, accesToken });
   } catch (err) {
     res.status(500).json(err);
   }
