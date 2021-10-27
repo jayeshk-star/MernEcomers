@@ -1,25 +1,26 @@
 const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 2345;
-
 const mongoose = require("mongoose");
+const app = express();
 const dotenv = require("dotenv");
 
-const userRoute=require("./routes/user")
-dotenv.config();
-app.use(express.json())
+const PORT = process.env.PORT || 5000;
+const userRoute = require("./routes/user");
+const authRoute = require("./routes/auth");
 
+dotenv.config();
 mongoose
   .connect(process.env.URL)
   .then(() => {
-    console.log("connect succesful");
+    console.log("database connected successful");
   })
-  .catch((e) => {
-    console.log(e);
+  .catch((error) => {
+    console.log(err);
   });
- 
-  app.use("/api/users",userRoute)
+
+app.use(express.json());
+app.use("/api/auth", authRoute);
+app.use("/api/users", userRoute);
 
 app.listen(PORT, () => {
-  console.log("backend is running");
+  console.log(`server is running on port ${PORT}`);
 });
